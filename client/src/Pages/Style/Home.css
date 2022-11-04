@@ -1,0 +1,70 @@
+.container {
+  position: absolute;
+  width: 100vw;
+  min-height: 100px;
+  background-color: rgb(255, 255, 255);
+  display: table;
+  overflow: scroll;
+}
+
+.search_bar_button {
+  width: 60vw;
+  height: 30vh;
+  background-color: rgb(255, 255, 255);
+  margin-left: 20vw;
+  position: relative;
+}
+
+.result_display {
+  width: 90vw;
+  height: 70vh;
+  margin-left: 5vw;
+  background-color: rgb(255, 255, 255);
+}
+
+.userLocationResult {
+  width: 100%;
+  height: 50%;
+  background-color: rgb(255, 255, 255);
+  position: relative;
+}
+
+.removeUserLocationResult {
+  display: none;
+}
+
+.otherLocationResult {
+  width: 100%;
+  height: 50%;
+  background-color: rgb(255, 255, 255);
+  position: relative;
+  border: 1px solid;
+}
+
+.formContainer {
+  width: 100%;
+  height: 30%;
+  background-color: rgb(255, 255, 255);
+  position: relative;
+  top: 35%;
+}
+
+.formSearch {
+  margin-left: 25%;
+}
+
+.formInput {
+  font-size: 3vh;
+  width: 50%;
+  height: 50%;
+  border: 1px solid;
+  border-radius: 50px;
+}
+
+.formButton {
+  font-size: 3vh;
+  width: 50%;
+  height: 50%;
+  border: 1px solid;
+  border-radius: 50px;
+}
