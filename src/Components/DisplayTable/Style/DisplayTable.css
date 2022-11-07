@@ -1,0 +1,17 @@
+.weatherResultContainer {
+  width: 90vw;
+  height: 33vh;
+  background-color: rgb(212, 207, 207);
+
+  display: flex;
+}
+.weatherResultDiv {
+  height: 100%;
+  width: 300px;
+  background-color: rgb(250, 250, 250);
+  margin-left: 10px;
+}
+
+.removeOtherLocationResult {
+  display: none;
+}

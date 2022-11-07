@@ -5,24 +5,23 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      urlSample:
-        "http://dataservice.accuweather.com/locations/v1/cities/search?apikey=PRVRZSMiOwFiRxQikyjEvnCw3uFit564&q=tampere",
       url: "",
-      cityKey: "",
       data: [],
-      valueInput: "",
+      valueInputCity: "",
+      valueInputCountry: "",
       error: "",
-      city1: 0,
-      city2: 0,
-      cityLocate1: "",
-      cityLocate2: "",
-      cityState: 0,
+      cityName: "",
+      countryName: "",
+      dataStatus: false,
+      place: {},
       locateAllow: false,
       userLocationLatitude: "",
       userLocationLongitude: "",
+      firstTime: false,
     };
     this.getLocation = this.getLocation.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeCity = this.handleChangeCity.bind(this);
+    this.handleChangeCountry = this.handleChangeCountry.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -35,7 +34,6 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    const cityArray = [];
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.getLocation(position);
@@ -48,56 +46,83 @@ class Home extends React.Component {
       }
     );
 
-    fetch(this.state.urlSample)
-      .then((response) => response.text())
-      .then((text) => (text.length ? JSON.parse(text) : {}))
-      .then((data) => {
-        data.map((city) => {
-          cityArray.push(city.Key);
-        });
-      })
-      .then(
-        console.log(cityArray),
-        this.setState({ city: cityArray }, () => {
-          console.log(this.state.city);
-        })
-      );
+    /* const dataFetch = () => {
+      try {
+        fetch(
+          "https://aerisweather1.p.rapidapi.com/forecasts/cairo,eg",
+          options
+        )
+          .then((response) => response.text())
+          .then((text) => (text.length ? JSON.parse(text) : {}))
+          .then((data) => {
+            this.setState({
+              data: data,
+            });
+          });
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    dataFetch(); */
   }
 
-  handleChange(event) {
-    const string = event.target.value.replace(/ /g, "%20");
+  handleChangeCity(event) {
     this.setState({
-      valueInput: string,
+      valueInputCity: event.target.value,
+    });
+  }
+
+  handleChangeCountry(event) {
+    this.setState({
+      valueInputCountry: event.target.value,
     });
   }
 
   handleSubmit(event) {
     event.preventDefault();
+    this.setState({
+      data: "",
+      dataStatus: false,
+      place: {},
+      firstTime: true,
+    });
+    const options = {
+      method: "GET",
+      url: "https://aerisweather1.p.rapidapi.com/forecasts/cairo,eg",
+      headers: {
+        "X-RapidAPI-Key": "264e567887msha24859b1f418962p197fdfjsn46e485755706",
+        "X-RapidAPI-Host": "aerisweather1.p.rapidapi.com",
+      },
+    };
 
     this.setState(
       {
         url:
-          `http://dataservice.accuweather.com/locations/v1/cities/search?apikey=PRVRZSMiOwFiRxQikyjEvnCw3uFit564&q=` +
-          this.state.valueInput,
-        city1: 0,
-        city2: 0,
+          "https://aerisweather1.p.rapidapi.com/forecasts/" +
+          this.state.valueInputCity +
+          "," +
+          this.state.valueInputCountry,
       },
       () => {
         console.log(this.state.url);
-        fetch(this.state.url)
+        fetch(this.state.url, options)
           .then((response) => response.text())
-          .then((text) => (text.length ? JSON.parse(text) : null))
+          .then((text) =>
+            text.length ? JSON.parse(text) : console.log("not found")
+          )
           .then((data) => {
             this.setState({
-              city1: data[0].Key,
-              city2: data[1].Key,
-              cityLocate1: data[0].EnglishName + "," + data[0].Country.ID,
-              cityLocate2: data[1].EnglishName + "," + data[1].Country.ID,
+              data: data.response[0].periods,
+              dataStatus: true,
+              place: data.response[0].place,
             });
           })
-          .then(console.log(this.state.city1, this.state.city2))
           .catch((error) => {
-            throw error;
+            console.log(error.message);
+            this.setState({
+              dataStatus: false,
+            });
           });
       }
     );
@@ -112,9 +137,16 @@ class Home extends React.Component {
               <input
                 type="text"
                 className="formInput"
-                value={this.state.value}
-                onChange={this.handleChange}
+                value={this.state.valueInputCity}
+                onChange={this.handleChangeCity}
                 placeholder="Enter city name"
+              />
+              <input
+                type="text"
+                className="formInput"
+                value={this.state.valueInputCountry}
+                onChange={this.handleChangeCountry}
+                placeholder="Enter country name"
               />
 
               <input type="submit" value="Search" className="formButton" />
@@ -122,27 +154,19 @@ class Home extends React.Component {
           </div>
         </div>
         <div className="result_display">
-          {this.state.city1 == 0 ? (
-            <p color="red">City not found</p>
-          ) : (
-            <div className="otherLocationResult">
-              <DisplayTable
-                cityArray={this.state.city1}
-                cityLocate={this.state.cityLocate1}
-              />
-            </div>
-          )}
-
-          {this.state.city2 == 0 ? (
-            <p></p>
-          ) : (
-            <div className="otherLocationResult">
-              <DisplayTable
-                cityArray={this.state.city2}
-                cityLocate={this.state.cityLocate2}
-              />
-            </div>
-          )}
+          <div
+            className={
+              this.state.firstTime
+                ? "otherLocationResult"
+                : "removeOtherLocationResult"
+            }
+          >
+            <DisplayTable
+              data={this.state.data}
+              dataStatus={this.state.dataStatus}
+              place={this.state.place}
+            />
+          </div>
         </div>
       </div>
     );
